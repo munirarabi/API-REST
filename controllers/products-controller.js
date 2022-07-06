@@ -19,7 +19,7 @@ exports.getAllProducts = (req, res, next) => {
               id_product: prod.id_product,
               name: prod.name,
               price: prod.price,
-              image_product: process.env.URL_API + prod.image_product,
+              image_product: prod.image_product,
               request: {
                 type: "GET",
                 description: "Retorna o produto especifico",
@@ -50,18 +50,18 @@ exports.postProduct = (req, res, next) => {
         if (error) {
           return res.status(500).send({ error: error });
         }
-
+        console.log(result);
         const response = {
           message: "Produto inserido com sucesso",
           productCreated: {
-            id_product: result.id_product,
+            id_product: result.insertId,
             name: req.body.name,
             price: req.body.price,
-            image_product: process.env.URL_API + req.file.path,
+            image_product: req.file.path,
             request: {
               type: "GET",
               description: "Retorna todos os produtos",
-              url: process.env.URL_API + "products/" + id_product,
+              url: process.env.URL_API + "products/" + result.insertId,
             },
           },
         };
@@ -91,13 +91,12 @@ exports.getOneProduct = (req, res, next) => {
             message: "Não foi encontrado o produto com esté ID",
           });
         }
-
         const response = {
           product: {
             id_product: result[0].id_product,
             name: result[0].name,
             price: result[0].price,
-            image_product: process.env.URL_API + result[0].image_product,
+            image_product: result[0].image_product,
             request: {
               type: "GET",
               description: "Retorna os dados de todos os produtos",
@@ -136,7 +135,7 @@ exports.patchProduct = (req, res, next) => {
             id_product: req.body.id_product,
             name: req.body.name,
             price: req.body.price,
-            image_product: process.env.URL_API + req.file.path,
+            image_product: req.file.path,
             request: {
               type: "PATCH",
               description: "Atualiza um produto",

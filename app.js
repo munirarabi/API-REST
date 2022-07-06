@@ -5,8 +5,10 @@ const bodyParser = require("body-parser");
 
 const routeProducts = require("./routes/products");
 const routeRequests = require("./routes/requests");
+const routeUsers = require("./routes/users");
 
 app.use(morgan("dev"));
+app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: false })); // APENAS DADOS SIMPLES
 app.use(bodyParser.json());
 
@@ -27,6 +29,7 @@ app.use((req, res, next) => {
 
 app.use("/products", routeProducts);
 app.use("/requests", routeRequests);
+app.use("/users", routeUsers);
 
 // QUANDO NÃO ENCONTRAR A ROTA
 app.use((req, res, next) => {
@@ -38,8 +41,9 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   return res.send({
-    erro: {
+    error: {
       message: error.message,
+      localError: "app.js/app.use",
     },
   });
 });

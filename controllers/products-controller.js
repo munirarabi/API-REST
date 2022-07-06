@@ -61,7 +61,7 @@ exports.postProduct = (req, res, next) => {
             request: {
               type: "GET",
               description: "Retorna todos os produtos",
-              url: "http://process.env.URL_API/products",
+              url: process.env.URL_API + "/products",
             },
           },
         };
@@ -101,7 +101,7 @@ exports.getOneProduct = (req, res, next) => {
             request: {
               type: "GET",
               description: "Retorna os dados de todos os produtos",
-              url: "http://process.env.URL_API/products",
+              url: process.env.URL_API + "/products",
             },
           },
         };
@@ -140,7 +140,7 @@ exports.patchProduct = (req, res, next) => {
             request: {
               type: "PATCH",
               description: "Atualiza um produto",
-              url: "http://process.env.URL_API/products/" + req.body.id_product,
+              url: process.env.URL_API + "/products/" + req.body.id_product,
             },
           },
         };

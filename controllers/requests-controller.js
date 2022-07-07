@@ -11,7 +11,8 @@ exports.getAllRequests = (req, res, next) => {
                 requests.quantity,
                 products.id_product,
                 products.name,
-                products.price
+                products.price,
+                products.image_product
               FROM requests
          INNER JOIN products
                   ON products.id_product = requests.id_product`,
@@ -29,6 +30,7 @@ exports.getAllRequests = (req, res, next) => {
                 id_product: request.id_product,
                 name: request.name,
                 price: request.price,
+                image_product: process.env.URL_API + request.image_product,
               },
               request: {
                 type: "GET",

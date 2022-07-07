@@ -50,7 +50,6 @@ exports.postProduct = (req, res, next) => {
         if (error) {
           return res.status(500).send({ error: error });
         }
-        console.log(result);
         const response = {
           message: "Produto inserido com sucesso",
           productCreated: {
@@ -116,7 +115,6 @@ exports.patchProduct = (req, res, next) => {
     if (error) {
       return res.status(500).send({ error: error });
     }
-    console.log(req.file.path);
     conn.query(
       `UPDATE products SET name = ?, price = ?, image_product = ? WHERE id_product = ?`,
       [req.body.name, req.body.price, req.file.path, req.body.id_product],
@@ -135,7 +133,7 @@ exports.patchProduct = (req, res, next) => {
             id_product: req.body.id_product,
             name: req.body.name,
             price: req.body.price,
-            image_product: req.file.path,
+            image_product: process.env.URL_API + req.file.path,
             request: {
               type: "PATCH",
               description: "Atualiza um produto",

@@ -19,20 +19,33 @@ exports.getProducts = async (req, res, next) => {
 
     const result2 = await mysql.execute(query2, [req.query.categoryId]);
 
+    let arrPaths = [];
+    const query3 = `SELECT path FROM productImages WHERE productId = ${result[0].productId};`;
+
+    const result3 = await mysql.execute(query3);
+    result3.map((path) => {
+      // console.log(path.path)
+      arrPaths.push(path.path);
+    });
+
+    // console.log(path)
+
     const response = {
       length: result.length,
       products: result.map((prod) => {
+        arrPaths.push(prod.productImage);
         return {
           productId: prod.productId,
           name: prod.name,
           price: prod.price,
-          productImage: prod.productImage,
+          // productImage: prod.productImage,
+          path: arrPaths.reverse(),
           categoryId: req.query.categoryId,
           category: result2[0].name,
           request: {
             type: "GET",
             description: "Retorna  especifico",
-            url: process.env.URL_API + prod.productId,
+            url: process.env.URL_API + "products/" + prod.productId,
           },
         };
       }),
@@ -175,7 +188,7 @@ exports.deleteProduct = async (req, res, next) => {
     if (error.code == "ER_NO_REFERENCED_ROW_2") {
       return res.status(404).send({
         message: "Não foi encontrado nenhuma categoria com esté ID",
-        categories: process.env.URL_API + "categories"
+        categories: process.env.URL_API + "categories",
       });
     }
 
@@ -196,7 +209,7 @@ exports.postImage = async (req, res, next) => {
       createdImage: {
         productId: parseInt(req.params.productId),
         imageId: result.insertId,
-        productImage: req.file.path,
+        productImage: process.env.URL_API + req.file.path,
         request: {
           type: "GET",
           description: "Retorna todas as imagens",

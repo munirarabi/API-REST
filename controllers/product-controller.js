@@ -27,6 +27,8 @@ exports.getProducts = async (req, res, next) => {
           name: prod.name,
           price: prod.price,
           productImage: prod.productImage,
+          pathImages:
+            process.env.URL_API + "products/" + prod.productId + "/images",
           categoryId: req.query.categoryId,
           category: result2[0].name,
           request: {

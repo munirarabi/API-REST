@@ -172,6 +172,13 @@ exports.deleteProduct = async (req, res, next) => {
 
     return res.status(202).send(response);
   } catch (error) {
+    if (error.code == "ER_NO_REFERENCED_ROW_2") {
+      return res.status(404).send({
+        message: "Não foi encontrado nenhuma categoria com esté ID",
+        categories: process.env.URL_API + "categories"
+      });
+    }
+
     return res.status(500).send({ error: error });
   }
 };

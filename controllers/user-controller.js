@@ -2,9 +2,9 @@ const mysql = require("../mysql");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-exports.postUserRegister = async (req, res, next) => {
+exports.createuser = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT id_user, email, password FROM users WHERE email = ?;`;
+    const insertQuery = `SELECT userId, email, password FROM users WHERE email = ?;`;
     const result = await mysql.execute(insertQuery, [req.body.email]);
 
     if (result.length > 0) {
@@ -26,7 +26,7 @@ exports.postUserRegister = async (req, res, next) => {
         const response = {
           message: "Usuário criado com sucesso",
           userCreated: {
-            id_user: result2.insertId,
+            userId: result2.insertId,
             email: req.body.email,
           },
         };
@@ -39,16 +39,16 @@ exports.postUserRegister = async (req, res, next) => {
   }
 };
 
-exports.postUserLogin = async (req, res) => {
+exports.loginUser = async (req, res) => {
   try {
-    const insertQuery = `SELECT id_user, email, password FROM users WHERE email = ?;`;
+    const insertQuery = `SELECT userId, email, password FROM users WHERE email = ?;`;
     const result = await mysql.execute(insertQuery, [req.body.email]);
 
     if (result.length < 1) {
       return res.status(401).send({ message: "Falha na autenticação" });
     }
 
-    const idUser = result[0].id_user;
+    const idUser = result[0].userId;
     const emailUser = result[0].email;
 
     bcrypt.compare(req.body.password, result[0].password, (error, result) => {
@@ -59,7 +59,7 @@ exports.postUserLogin = async (req, res) => {
       if (result) {
         const token = jwt.sign(
           {
-            id_user: idUser,
+            userId: idUser,
             email: emailUser,
           },
           process.env.JWT_KEY,

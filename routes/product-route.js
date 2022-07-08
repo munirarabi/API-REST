@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const login = require("../middleware/login");
 
-const ProductsController = require("../controllers/products-controller");
+const productController = require("../controllers/product-controller");
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -35,29 +35,38 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-// RETORNA TODOS OS PRODUTOS
-router.get("/", ProductsController.getAllProducts);
+router.get("/", productController.getProducts);
 
-// INSERE UM PRODUTO
 router.post(
   "/",
-  login.isNecesser,
-  upload.single("image_product"),
-  ProductsController.postProduct
+  login.required,
+  upload.single("productImage"),
+  productController.createProduct
 );
 
-// RETORNA OS DADOS DE UM PRODUTO
-router.get("/:id_product", ProductsController.getOneProduct);
+router.get("/:productId", productController.getProductDetail);
 
-// ALTERA UM PRODUTO
 router.patch(
-  "/",
-  login.isNecesser,
-  upload.single("image_product"),
-  ProductsController.patchProduct
+  "/:productId",
+  login.required,
+  upload.single("productImage"),
+  productController.updateProduct
 );
 
-// EXCLUI UM PRODUTO
-router.delete("/", login.isNecesser, ProductsController.deleteProduct);
+router.delete(
+  "/:productId",
+  login.required,
+  productController.deleteProduct
+);
+
+// IMAGES
+router.post(
+  "/:productId/image",
+  login.required,
+  upload.single("productImage"),
+  productController.postImage
+);
+
+router.get("/:productId/images", productController.getImages);
 
 module.exports = router;

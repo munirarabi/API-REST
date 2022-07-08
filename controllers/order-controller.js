@@ -1,34 +1,34 @@
 const mysql = require("../mysql");
 
-exports.getAllRequests = async (req, res, next) => {
+exports.getOrders = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT requests.id_request,
-    requests.quantity,
-    products.id_product,
-    products.name,
-    products.price,
-    products.image_product
-  FROM requests
-INNER JOIN products
-      ON products.id_product = requests.id_product;`;
+    const insertQuery = `SELECT orders.orderId,
+                                orders.quantity,
+                                products.productId,
+                                products.name,
+                                products.price,
+                                products.productImage
+                          FROM orders
+                    INNER JOIN products
+                          ON products.productId = orders.productId;`;
 
     const result = await mysql.execute(insertQuery);
 
     const response = {
-      requests: result.map((request) => {
+      orders: result.map((order) => {
         return {
-          id_request: request.id_request,
-          quantity: request.quantity,
+          orderId: order.orderId,
+          quantity: order.quantity,
           product: {
-            id_product: request.id_product,
-            name: request.name,
-            price: request.price,
-            image_product: process.env.URL_API + request.image_product,
+            productId: order.productId,
+            name: order.name,
+            price: order.price,
+            // productImage: process.env.URL_API + order.productImage,
           },
           request: {
             type: "GET",
             description: "Retorna os detalhes de um pedido específico",
-            url: process.env.URL_API + request.id_request,
+            url: process.env.URL_API + order.orderId,
           },
         };
       }),
@@ -40,10 +40,10 @@ INNER JOIN products
   }
 };
 
-exports.postRequest = async (req, res, next) => {
+exports.postOrder = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT id_product, name, price FROM products WHERE id_product = ?;`;
-    const result = await mysql.execute(insertQuery, [req.body.id_product]);
+    const insertQuery = `SELECT productId, name, price FROM products WHERE productId = ?;`;
+    const result = await mysql.execute(insertQuery, [req.body.productId]);
 
     if (result.length == 0) {
       return res.status(404).send({
@@ -51,21 +51,21 @@ exports.postRequest = async (req, res, next) => {
       });
     }
 
-    const insertQuery2 = `INSERT INTO requests (id_product, quantity) VALUES (?,?);`;
+    const insertQuery2 = `INSERT INTO orders (productId, quantity) VALUES (?,?);`;
     const result2 = await mysql.execute(insertQuery2, [
-      req.body.id_product,
+      req.body.productId,
       req.body.quantity,
     ]);
     const response = {
       message: "Pedido inserido com sucesso",
-      requestCreated: {
-        id_request: result2.id_request,
-        id_product: req.body.id_product,
+      createdOrder: {
+        orderId: result2.orderId,
+        productId: req.body.productId,
         quantity: req.body.quantity,
         request: {
           type: "GET",
           description: "Retorna todos os pedidos",
-          url: process.env.URL_API,
+          url: process.env.URL_API + "orders",
         },
       },
     };
@@ -76,10 +76,10 @@ exports.postRequest = async (req, res, next) => {
   }
 };
 
-exports.getOneRequest = async (req, res, next) => {
+exports.getOrderDetail = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT id_request, id_product, quantity FROM requests WHERE id_request = ?;`;
-    const result = await mysql.execute(insertQuery, [req.params.id_request]);
+    const insertQuery = `SELECT orderId, productId, quantity FROM orders WHERE orderId = ?;`;
+    const result = await mysql.execute(insertQuery, [req.params.orderId]);
 
     if (result.length == 0) {
       return res.status(404).send({
@@ -88,9 +88,9 @@ exports.getOneRequest = async (req, res, next) => {
     }
 
     const response = {
-      request: {
-        id_request: result[0].id_request,
-        id_product: result[0].id_product,
+      order: {
+        orderId: result[0].orderId,
+        productId: result[0].productId,
         quantity: result[0].quantity,
         request: {
           type: "GET",
@@ -106,10 +106,10 @@ exports.getOneRequest = async (req, res, next) => {
   }
 };
 
-exports.deleteRequest = async (req, res, next) => {
+exports.deleteOrder = async (req, res, next) => {
   try {
-    const insertQuery = `DELETE FROM requests WHERE id_request = ?;`;
-    const result = await mysql.execute(insertQuery, [req.body.id_request]);
+    const insertQuery = `DELETE FROM orders WHERE orderId = ?;`;
+    const result = await mysql.execute(insertQuery, [req.body.orderId]);
     if (result.affectedRows == 0) {
       return res.status(404).send({
         message: "Não foi encontrado o pedido com esté ID",
@@ -123,7 +123,7 @@ exports.deleteRequest = async (req, res, next) => {
         description: "Insere um pedido",
         url: process.env.URL_API,
         body: {
-          id_product: "Number",
+          productId: "Number",
           quantity: "Number",
         },
       },

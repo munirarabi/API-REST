@@ -3,9 +3,10 @@ const app = express();
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 
-const routeProducts = require("./routes/products");
-const routeRequests = require("./routes/requests");
-const routeUsers = require("./routes/users");
+const productRoute = require("./routes/product-route");
+const orderRoute = require("./routes/order-route");
+const userRoute = require("./routes/user-route");
+const imageRoute = require("./routes/image-route");
 
 app.use(morgan("dev"));
 app.use("/uploads", express.static("uploads"));
@@ -27,9 +28,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/products", routeProducts);
-app.use("/requests", routeRequests);
-app.use("/users", routeUsers);
+app.use("/products", productRoute);
+app.use("/orders", orderRoute);
+app.use("/users", userRoute);
+app.use("/images", imageRoute);
 
 // QUANDO NÃO ENCONTRAR A ROTA
 app.use((req, res, next) => {

@@ -19,27 +19,14 @@ exports.getProducts = async (req, res, next) => {
 
     const result2 = await mysql.execute(query2, [req.query.categoryId]);
 
-    let arrPaths = [];
-    const query3 = `SELECT path FROM productImages WHERE productId = ${result[0].productId};`;
-
-    const result3 = await mysql.execute(query3);
-    result3.map((path) => {
-      // console.log(path.path)
-      arrPaths.push(path.path);
-    });
-
-    // console.log(path)
-
     const response = {
       length: result.length,
       products: result.map((prod) => {
-        arrPaths.push(prod.productImage);
         return {
           productId: prod.productId,
           name: prod.name,
           price: prod.price,
-          // productImage: prod.productImage,
-          path: arrPaths.reverse(),
+          productImage: prod.productImage,
           categoryId: req.query.categoryId,
           category: result2[0].name,
           request: {
@@ -50,6 +37,7 @@ exports.getProducts = async (req, res, next) => {
         };
       }),
     };
+
     return res.status(200).send(response);
   } catch (error) {
     return res.status(500).send({ error: error });

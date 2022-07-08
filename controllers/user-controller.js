@@ -4,37 +4,29 @@ const jwt = require("jsonwebtoken");
 
 exports.createuser = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT userId, email, password FROM users WHERE email = ?;`;
-    const result = await mysql.execute(insertQuery, [req.body.email]);
+    const users = req.body.users.map((user) => [
+      user.email,
+      bcrypt.hashSync(user.password, 10),
+    ]);
 
-    if (result.length > 0) {
-      res.status(409).send({
-        message: "Usuário já cadastrado",
-      });
-    } else {
-      bcrypt.hash(req.body.password, 10, async (errBcrypt, hash) => {
-        if (errBcrypt) {
-          return res.status(500).send({ error: errBcrypt });
-        }
+    insertQuery = `INSERT INTO users (email, password) VALUES ?;`;
+    const results = await mysql.execute(insertQuery, [users]);
 
-        const insertQuery2 = `INSERT INTO users (email, password) VALUES (?,?);`;
-        const result2 = await mysql.execute(insertQuery2, [
-          req.body.email,
-          hash,
-        ]);
+    const response = {
+      message: "Usuário criado com sucesso",
+      createdUsers: req.body.users.map((user) => {
+        return { email: user.email };
+      }),
+    };
 
-        const response = {
-          message: "Usuário criado com sucesso",
-          userCreated: {
-            userId: result2.insertId,
-            email: req.body.email,
-          },
-        };
-
-        return res.status(201).send(response);
+    return res.status(201).send(response);
+  } catch (error) {
+    if (error.code == "ER_DUP_ENTRY") {
+      return res.status(409).send({
+        message: "Esse usuário já existe",
       });
     }
-  } catch (error) {
+
     return res.status(500).send({ error: error });
   }
 };

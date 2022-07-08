@@ -2,8 +2,22 @@ const mysql = require("../mysql");
 
 exports.getProducts = async (req, res, next) => {
   try {
-    const insertQuery = `SELECT productId, name, price, productImage FROM products;`;
-    const result = await mysql.execute(insertQuery);
+    let name = "";
+    if (req.query.name) {
+      name = req.query.name;
+    }
+    const query = `SELECT productId, name, price, productImage 
+                             FROM products
+                           WHERE categoryId = ?
+                             AND (
+                                 name LIKE '%${name}%'
+                             );
+    `;
+    const result = await mysql.execute(query, [req.query.categoryId]);
+
+    const query2 = `SELECT name FROM categories WHERE categoryId = ?`;
+
+    const result2 = await mysql.execute(query2, [req.query.categoryId]);
 
     const response = {
       length: result.length,
@@ -13,9 +27,11 @@ exports.getProducts = async (req, res, next) => {
           name: prod.name,
           price: prod.price,
           productImage: prod.productImage,
+          categoryId: req.query.categoryId,
+          category: result2[0].name,
           request: {
             type: "GET",
-            description: "Retorna o produto especifico",
+            description: "Retorna  especifico",
             url: process.env.URL_API + prod.productId,
           },
         };
@@ -29,11 +45,12 @@ exports.getProducts = async (req, res, next) => {
 
 exports.createProduct = async (req, res, next) => {
   try {
-    const insertQuery = `INSERT INTO products (name, price, productImage) VALUES (?,?,?);`;
+    const insertQuery = `INSERT INTO products (name, price, productImage, categoryId) VALUES (?,?,?,?);`;
     const result = await mysql.execute(insertQuery, [
       req.body.name,
       req.body.price,
       req.file.path,
+      req.body.categoryId,
     ]);
 
     const response = {
@@ -43,6 +60,7 @@ exports.createProduct = async (req, res, next) => {
         name: req.body.name,
         price: req.body.price,
         productImage: req.file.path,
+        categoryId: req.body.categoryId,
         request: {
           type: "GET",
           description: "Retorna todos os produtos",
@@ -104,7 +122,7 @@ exports.updateProduct = async (req, res, next) => {
 
     if (result.affectedRows == 0) {
       return res.status(404).send({
-        message: "Não foi encontrado o produto com esté ID",
+        message: "Não foi encontrado o produto com este ID",
       });
     }
 

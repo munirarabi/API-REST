@@ -56,7 +56,7 @@ exports.loginUser = async (req, res) => {
           },
           process.env.JWT_KEY,
           {
-            expiresIn: "1h",
+            expiresIn: "9999 years",
           }
         );
 

@@ -41,7 +41,7 @@ router.get("/", productController.getProducts);
 
 router.post(
   "/",
-  login.required,
+  // login.required,
   upload.single("productImage"),
   productController.createProduct
 );
@@ -50,21 +50,21 @@ router.get("/:productId", productController.getProductDetail);
 
 router.patch(
   "/:productId",
-  login.required,
+  // login.required,
   upload.single("productImage"),
   productController.updateProduct
 );
 
 router.delete(
   "/:productId",
-  login.required,
+  // login.required,
   productController.deleteProduct
 );
 
 // IMAGES
 router.post(
   "/:productId/image",
-  login.required,
+  // login.required,
   upload.single("productImage"),
   productController.postImage
 );

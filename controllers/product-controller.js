@@ -106,6 +106,12 @@ exports.createProduct = async (req, res, next) => {
 
     return res.status(201).send(response);
   } catch (error) {
+    if (error.code == "ER_NO_REFERENCED_ROW_2") {
+      return res.status(404).send({
+        message:
+          "Não foi encontrado a categoria com esse ID.",
+      });
+    }
     return res.status(500).send({ error: error });
   }
 };

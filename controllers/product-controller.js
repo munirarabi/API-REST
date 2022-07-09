@@ -1,5 +1,37 @@
 const mysql = require("../mysql");
 
+exports.getAllProducts = async (req, res, next) => {
+  try {
+    const query = `SELECT productId, name, price, productImage 
+                             FROM products;
+    `;
+    const result = await mysql.execute(query);
+
+    const response = {
+      length: result.length,
+      products: result.map((prod) => {
+        return {
+          productId: prod.productId,
+          name: prod.name,
+          price: prod.price,
+          productImage: prod.productImage,
+          pathImages:
+            process.env.URL_API + "products/" + prod.productId + "/images",
+          request: {
+            type: "GET",
+            description: "Retorna  especifico",
+            url: process.env.URL_API + "products/" + prod.productId,
+          },
+        };
+      }),
+    };
+
+    return res.status(200).send(response);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+};
+
 exports.getProducts = async (req, res, next) => {
   try {
     let name = "";

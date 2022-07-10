@@ -35,7 +35,7 @@ app.use("/orders", orderRoute);
 app.use("/users", userRoute);
 app.use("/images", imageRoute);
 
-// QUANDO NÃO ENCONTRAR A ROTA
+// QUANDO NAO ENCONTRAR A ROTA
 app.use((req, res, next) => {
   const erro = new Error("Rota não encontrada!");
   erro.status = 404;

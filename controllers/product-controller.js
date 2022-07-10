@@ -108,11 +108,16 @@ exports.createProduct = async (req, res, next) => {
   } catch (error) {
     if (error.code == "ER_NO_REFERENCED_ROW_2") {
       return res.status(404).send({
-        message:
-          "Não foi encontrado a categoria com esse ID.",
+        message: "Não foi encontrado a categoria com esse ID.",
       });
     }
-    return res.status(500).send({ error: error });
+
+    if (error.code == "ER_TRUNCATED_WRONG_VALUE_FOR_FIELD") {
+      return res.status(404).send({
+        message: "Preencha todos os campos.",
+      });
+    }
+    return res.status(500).send(console.error(error));
   }
 };
 

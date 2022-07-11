@@ -89,7 +89,7 @@ exports.createProduct = async (req, res, next) => {
     ]);
 
     const response = {
-      message: "Produto inserido com sucesso",
+      message: "Produto inserido com sucesso.",
       productCreated: {
         productId: result.insertId,
         name: req.body.name,
